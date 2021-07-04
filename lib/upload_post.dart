@@ -70,13 +70,6 @@ class _UploadPostState extends State<UploadPost> {
                   width: 200,
                   height: 200,
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(5)
-                      ),
-                      border: Border.all(
-                        color: Colors.black,
-                        width: 1
-                      ),
                       image: DecorationImage(
                         image: FileImage(widget.imgPost),
                         fit: BoxFit.cover

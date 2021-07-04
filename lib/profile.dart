@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -76,71 +77,56 @@ class _ProfileState extends State<Profile> {
                   return Center(
                       child: CircularProgressIndicator(color: Colors.blue)
                   );
-                return snapshot.data.docs[0]['photo'] != null ?
-                Padding(
-                  padding: EdgeInsets.fromLTRB(15,15,0,10),
-                  child: Container(
-                    width: 110.0,
-                    height: 110.0,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(80),
-                        image: DecorationImage(
-                            image: NetworkImage(snapshot.data.docs[0]['photo']),
-                            fit: BoxFit.cover
-                        )
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    snapshot.data.docs[0]['photo'] != null ?
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(15,15,0,10),
+                      child: Container(
+                        width: 110.0,
+                        height: 110.0,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(80),
+                            image: DecorationImage(
+                                image: NetworkImage(snapshot.data.docs[0]['photo']),
+                                fit: BoxFit.cover
+                            )
+                        ),
+                      ),
+                    ) :
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(15,15,0,10),
+                      child: Container(
+                        width: 110.0,
+                        height: 110.0,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(80),
+                            image: DecorationImage(
+                                image: AssetImage("assets/profile.png"),
+                                fit: BoxFit.cover
+                            )
+                        ),
+                      ),
                     ),
-                  ),
-                ) :
-                Padding(
-                  padding: EdgeInsets.fromLTRB(15,15,0,10),
-                  child: Container(
-                    width: 110.0,
-                    height: 110.0,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(80),
-                        image: DecorationImage(
-                            image: AssetImage("assets/profile.png"),
-                            fit: BoxFit.cover
-                        )
-                    ),
-                  ),
+                    snapshot.data.docs[0]['name'].toString().isNotEmpty ?
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(10,5,10,0),
+                      child: Text(snapshot.data.docs[0]['name'],
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                    ) :
+                    Container(),
+                    snapshot.data.docs[0]['bio'].toString().isNotEmpty ?
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(10,5,10,0),
+                      child: Text(snapshot.data.docs[0]['bio'],
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w300),
+                      ),
+                    ) :
+                    Container()
+                  ],
                 );
-              },
-            ),
-            StreamBuilder(
-              stream: FirebaseFirestore.instance
-                  .collection("users")
-                  .where("username", isEqualTo: currentUser.displayName)
-                  .snapshots(),
-              builder: (context, snapshot){
-                if(!snapshot.hasData)
-                  return Container();
-                return snapshot.data.docs[0]['name'].toString().isNotEmpty ?
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(10,5,10,0),
-                  child: Text(snapshot.data.docs[0]['name'],
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                ) :
-                Container();
-              },
-            ),
-            StreamBuilder(
-              stream: FirebaseFirestore.instance
-                  .collection("users")
-                  .where("username", isEqualTo: currentUser.displayName)
-                  .snapshots(),
-              builder: (context, snapshot){
-                if(!snapshot.hasData)
-                  return Container();
-                return snapshot.data.docs[0]['bio'].toString().isNotEmpty ?
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(10,5,10,0),
-                  child: Text(snapshot.data.docs[0]['bio'],
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w300),
-                  ),
-                ) :
-                Container();
               },
             ),
             Divider(color: Colors.grey),
@@ -169,14 +155,15 @@ class _ProfileState extends State<Profile> {
                 )
               ],
             ),
-            gridActive ? StreamBuilder(
+            StreamBuilder(
               stream: FirebaseFirestore.instance
                   .collection("posts")
                   .where("username", isEqualTo: currentUser.displayName)
                   .orderBy("postedAt", descending: true)
                   .snapshots(),
               builder: (context, snapshot){
-                return snapshot.hasData ? GridView.builder(
+                return snapshot.hasData ? gridActive ? GridView.builder(
+                  cacheExtent: 9999,
                   itemCount: snapshot.data.docs.length,
                   shrinkWrap: true,
                   physics: ScrollPhysics(),
@@ -189,110 +176,102 @@ class _ProfileState extends State<Profile> {
                             builder: (context) => PostDetails(index: index))
                         );
                       },
-                      child: Container(
-                        decoration: BoxDecoration(
-                            image: DecorationImage(
-                                image: new NetworkImage(snapshot.data.docs[index]['photoPost']),
-                                fit: BoxFit.cover
-                            )
-                        ),
+                      child: CachedNetworkImage(
+                        imageUrl: snapshot.data.docs[index]['photoPost'],
+                        errorWidget: (context, url, error) => Icon(Icons.error),
                       ),
                     );
                   },
-                ) : Container();
-              },
-            ) :
-            StreamBuilder(
-                stream: FirebaseFirestore.instance
-                    .collection("posts")
-                    .where("username", isEqualTo: currentUser.displayName)
-                    .orderBy("postedAt", descending: true)
-                    .snapshots(),
-                builder: (context, snapshot){
-                  return snapshot.hasData ? ListView.builder(
-                    itemCount: snapshot.data.docs.length,
-                    shrinkWrap: true,
-                    physics: ScrollPhysics(),
-                    itemBuilder: (context, index) => Container(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              StreamBuilder(
-                                stream: FirebaseFirestore.instance
-                                    .collection("users")
-                                    .where("username", isEqualTo: currentUser.displayName)
-                                    .snapshots(),
-                                builder: (context, snapshot){
-                                  if(!snapshot.hasData)
-                                    return Center(
-                                        child: CircularProgressIndicator(color: Colors.blue)
-                                    );
-                                  return snapshot.data.docs[0]['photo'] != null ?
-                                  Padding(
-                                    padding: EdgeInsets.fromLTRB(15,0,15,10),
-                                    child: Container(
-                                      width: 45,
-                                      height: 45,
-                                      decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(80),
-                                          image: DecorationImage(
-                                              image: NetworkImage(snapshot.data.docs[0]['photo']),
-                                              fit: BoxFit.cover
-                                          )
-                                      ),
-                                    ),
-                                  ) :
-                                  Padding(
-                                    padding: EdgeInsets.fromLTRB(15,0,15,10),
-                                    child: Container(
-                                      width: 45,
-                                      height: 45,
-                                      decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(80),
-                                          image: DecorationImage(
-                                              image: AssetImage("assets/profile.png"),
-                                              fit: BoxFit.cover
-                                          )
-                                      ),
-                                    ),
+                ) : ListView.builder(
+                  cacheExtent: 9999,
+                  itemCount: snapshot.data.docs.length,
+                  shrinkWrap: true,
+                  physics: ScrollPhysics(),
+                  itemBuilder: (context, index) => Container(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            StreamBuilder(
+                              stream: FirebaseFirestore.instance
+                                  .collection("users")
+                                  .where("username", isEqualTo: currentUser.displayName)
+                                  .snapshots(),
+                              builder: (context, snapshot){
+                                if(!snapshot.hasData)
+                                  return Center(
+                                      child: CircularProgressIndicator(color: Colors.blue)
                                   );
-                                },
-                              ),
+                                return snapshot.data.docs[0]['photo'] != null ?
+                                Padding(
+                                  padding: EdgeInsets.fromLTRB(15,0,15,10),
+                                  child: Container(
+                                    width: 45,
+                                    height: 45,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(80),
+                                        image: DecorationImage(
+                                            image: NetworkImage(snapshot.data.docs[0]['photo']),
+                                            fit: BoxFit.cover
+                                        )
+                                    ),
+                                  ),
+                                ) :
+                                Padding(
+                                  padding: EdgeInsets.fromLTRB(15,0,15,10),
+                                  child: Container(
+                                    width: 45,
+                                    height: 45,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(80),
+                                        image: DecorationImage(
+                                            image: AssetImage("assets/profile.png"),
+                                            fit: BoxFit.cover
+                                        )
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                            Text(currentUser.displayName,
+                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+                            ),
+                          ],
+                        ),
+                        CachedNetworkImage(
+                          imageUrl: snapshot.data.docs[index]['photoPost'],
+                          progressIndicatorBuilder: (context, url, downloadProgress) =>
+                              CircularProgressIndicator(value: downloadProgress.progress),
+                          errorWidget: (context, url, error) => Icon(Icons.error),
+                        ),
+                        snapshot.data.docs[index]["caption"].toString().isNotEmpty ? Padding(
+                          padding: EdgeInsets.fromLTRB(10,10,10,0),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
                               Text(currentUser.displayName,
-                                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                               ),
+                              SizedBox(width: 8),
+                              Expanded(
+                                child: Text(snapshot.data.docs[index]["caption"],
+                                  style: TextStyle(fontSize: 18),
+                                  maxLines: null,
+                                ),
+                              )
                             ],
                           ),
-                          Image.network(snapshot.data.docs[index]['photoPost']),
-                          snapshot.data.docs[index]["caption"].toString().isNotEmpty ? Padding(
-                            padding: EdgeInsets.fromLTRB(10,10,10,0),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(currentUser.displayName,
-                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                                ),
-                                SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(snapshot.data.docs[index]["caption"],
-                                    style: TextStyle(fontSize: 18),
-                                    maxLines: null,
-                                  ),
-                                )
-                              ],
-                            ),
-                          ) : Container(),
-                          Divider(
-                              color: Colors.grey
-                          ),
-                        ],
-                      ),
+                        ) : Container(),
+                        Divider(
+                            color: Colors.black
+                        ),
+                      ],
                     ),
-                  ) : Container();
-                }
-            ),
+                  ),
+                ) : Container();
+              },
+            )
           ],
         ),
       ),

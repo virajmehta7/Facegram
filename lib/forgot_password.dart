@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'auth.dart';
 
@@ -12,6 +13,45 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   final _formKey = GlobalKey<FormState>();
   TextEditingController email = new TextEditingController();
   AuthService authService = new AuthService();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  String error;
+
+  Widget showAlert() {
+    if (error != null) {
+      return Container(
+        color: Colors.blue,
+        width: double.infinity,
+        padding: EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: Icon(Icons.error_outline_sharp, color: Colors.white,),
+            ),
+            Expanded(
+              child: Text(error,
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: IconButton(
+                icon: Icon(Icons.close, color: Colors.white,),
+                onPressed: () {
+                  setState(() {
+                    error = null;
+                  });
+                },
+              ),
+            )
+          ],
+        ),
+      );
+    }
+    return SizedBox(
+      height: 0,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,10 +88,39 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                   ),
                 ),
               ),
+              Padding(
+                padding: EdgeInsets.only(bottom: 10),
+                child: showAlert(),
+              ),
               ElevatedButton(
-                onPressed: (){
+                onPressed: () async {
                   if (_formKey.currentState.validate()){
-                    authService.resetPassword(email.text);
+                    try {
+                      await _auth.sendPasswordResetEmail(
+                          email: email.text
+                      );
+                      setState(() {
+                        showDialog(
+                          context: context,
+                            builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text("Password Reset Email Sent"),
+                              content: Text("An email has been sent to ${email.text} "),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: Text('Ok'),
+                                )
+                              ],
+                            );
+                          }
+                        );
+                      });
+                    } catch(e) {
+                      setState(() {
+                        error = e.message;
+                      });
+                    }
                   }
                 },
                 child: Text('Send password reset email',

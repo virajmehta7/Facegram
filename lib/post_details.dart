@@ -20,11 +20,7 @@ class _PostDetailsState extends State<PostDetails> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Posts",
-          style: TextStyle(fontSize: 24, color: Colors.black),
-        ),
         iconTheme: IconThemeData(color: Colors.black),
-        centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.transparent,
       ),

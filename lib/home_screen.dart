@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:facegram/other_users_profile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -47,6 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 .snapshots(),
             builder: (context, snapshot){
               return snapshot.hasData ? ListView.builder(
+                cacheExtent: 9999,
                 itemCount: snapshot.data.docs.length,
                 itemBuilder: (context, index) => Container(
                   child: Column(
@@ -61,9 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 .snapshots(),
                             builder: (context, snapshot){
                               if(!snapshot.hasData)
-                                return Center(
-                                    child: CircularProgressIndicator(color: Colors.blue)
-                                );
+                                return Container();
                               return snapshot.data.docs[0]['photo'] != null ?
                               Padding(
                                 padding: EdgeInsets.fromLTRB(15,0,15,10),
@@ -108,7 +108,13 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ],
                       ),
-                      Image.network(snapshot.data.docs[index]['photoPost']),
+                      CachedNetworkImage(
+                        imageUrl: snapshot.data.docs[index]['photoPost'],
+                        progressIndicatorBuilder: (context, url, downloadProgress) =>
+                            CircularProgressIndicator(value: downloadProgress.progress),
+                        errorWidget: (context, url, error) => Icon(Icons.error),
+                      ),
+                      // Image.network(snapshot.data.docs[index]['photoPost']),
                       snapshot.data.docs[index]["caption"].toString().isNotEmpty ? Padding(
                         padding: EdgeInsets.fromLTRB(10,10,10,0),
                         child: Row(

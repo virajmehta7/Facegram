@@ -14,8 +14,8 @@ class AddPost extends StatefulWidget {
 class _AddPostState extends State<AddPost> {
   File imgPost;
 
-  editPost(ImageSource source) async {
-    final tempImage = await ImagePicker().getImage(source: source);
+  cropImage(ImageSource source) async {
+    final tempImage = await ImagePicker().getImage(source: source, imageQuality: 90);
     if(tempImage != null) {
       File croppedFile = await ImageCropper.cropImage(
         sourcePath: tempImage.path,
@@ -54,7 +54,7 @@ class _AddPostState extends State<AddPost> {
               child: Text("Choose from Gallery",
                   style: TextStyle(fontSize: 16)),
               onPressed: (){
-                editPost(ImageSource.gallery);
+                cropImage(ImageSource.gallery);
               },
             ),
             SimpleDialogOption(
@@ -62,7 +62,7 @@ class _AddPostState extends State<AddPost> {
                   style: TextStyle(fontSize: 16)
               ),
               onPressed: (){
-                editPost(ImageSource.camera);
+                cropImage(ImageSource.camera);
               },
             ),
           ],
