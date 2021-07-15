@@ -9,11 +9,11 @@ Facegram app built in flutter.
 <img src="https://user-images.githubusercontent.com/76491642/124095638-7d1dcb00-da77-11eb-889f-3dcc4929d33e.jpg" width="250">
 <img src="https://user-images.githubusercontent.com/76491642/124098503-3b425400-da7a-11eb-89a6-2395b9aa69ac.gif" width="250">
 <img src="https://user-images.githubusercontent.com/76491642/124100247-f0294080-da7b-11eb-9b8b-71ffdac2116b.gif" width="250">
-<img src="https://user-images.githubusercontent.com/76491642/124098500-3aa9bd80-da7a-11eb-9615-d4c04c85f3b4.gif" width="250">
+<img src="https://user-images.githubusercontent.com/76491642/125798200-4d53ef7f-cea7-4b97-a025-38b4cac2f930.png" width="250">
+<img src="https://user-images.githubusercontent.com/76491642/125798208-a64a4c1a-e47a-46bf-a8ca-307fb3ed4ed3.png" width="250">
+<img src="https://user-images.githubusercontent.com/76491642/125798220-791c77c5-ff58-4151-87c7-81de4e89513e.png" width="250">
 <img src="https://user-images.githubusercontent.com/76491642/124095670-860e9c80-da77-11eb-9483-6364676e4793.jpg" width="250">
 <img src="https://user-images.githubusercontent.com/76491642/124095676-87d86000-da77-11eb-957d-991a01a3bbf7.jpg" width="250">
-<img src="https://user-images.githubusercontent.com/76491642/124095684-8a3aba00-da77-11eb-8a5b-4ee52a0c0df1.jpg" width="250">
-
 <p>
  
 ## Getting Started
