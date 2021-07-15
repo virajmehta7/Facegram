@@ -143,8 +143,7 @@ class _RegisterState extends State<Register> {
                   final valid = await databaseMethods.usernameCheck(username.text);
                   if (!valid) {
                     setState(() {
-                      userName = username.text;
-                      error = 'The username $userName is not available.';
+                      error = 'The username ${username.text} is not available.';
                     });
                   }
                   else if (_formKey.currentState.validate()) {

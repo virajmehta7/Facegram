@@ -80,34 +80,62 @@ class _ProfileState extends State<Profile> {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    snapshot.data.docs[0]['photo'] != null ?
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(15,15,0,10),
-                      child: Container(
-                        width: 110.0,
-                        height: 110.0,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(80),
-                            image: DecorationImage(
-                                image: NetworkImage(snapshot.data.docs[0]['photo']),
-                                fit: BoxFit.cover
-                            )
+                    Row(
+                      children: [
+                        snapshot.data.docs[0]['photo'] != null ?
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(15,15,0,10),
+                          child: Container(
+                            width: 110.0,
+                            height: 110.0,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(80),
+                                image: DecorationImage(
+                                    image: NetworkImage(snapshot.data.docs[0]['photo']),
+                                    fit: BoxFit.cover
+                                )
+                            ),
+                          ),
+                        ) :
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(15,15,0,10),
+                          child: Container(
+                            width: 110.0,
+                            height: 110.0,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(80),
+                                image: DecorationImage(
+                                    image: AssetImage("assets/profile.png"),
+                                    fit: BoxFit.cover
+                                )
+                            ),
+                          ),
                         ),
-                      ),
-                    ) :
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(15,15,0,10),
-                      child: Container(
-                        width: 110.0,
-                        height: 110.0,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(80),
-                            image: DecorationImage(
-                                image: AssetImage("assets/profile.png"),
-                                fit: BoxFit.cover
-                            )
-                        ),
-                      ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 50),
+                          child: Column(
+                            children: [
+                              Text("Posts",
+                                  style: TextStyle(color: Colors.black, fontSize: 22)
+                              ),
+                              StreamBuilder(
+                                stream: FirebaseFirestore.instance
+                                    .collection("posts")
+                                    .where("username", isEqualTo: currentUser.displayName)
+                                    .snapshots(),
+                                builder: (context, snapshot){
+                                  if(!snapshot.hasData)
+                                    return Container();
+                                  final doc = snapshot.data.docs;
+                                  return Text(doc.length.toString(),
+                                    style: TextStyle(fontWeight: FontWeight.w300, color: Colors.black, fontSize: 20),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        )
+                      ],
                     ),
                     snapshot.data.docs[0]['name'].toString().isNotEmpty ?
                     Padding(

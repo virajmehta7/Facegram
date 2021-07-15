@@ -20,8 +20,12 @@ class _PostDetailsState extends State<PostDetails> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: Text("Post",
+            style: TextStyle(color: Colors.black, fontSize: 22, fontWeight: FontWeight.w600)
+        ),
         iconTheme: IconThemeData(color: Colors.black),
         elevation: 0,
+        centerTitle: true,
         backgroundColor: Colors.transparent,
       ),
       body: SingleChildScrollView(
@@ -81,6 +85,43 @@ class _PostDetailsState extends State<PostDetails> {
                       Text(currentUser.displayName,
                         style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
                       ),
+                      Spacer(),
+                      IconButton(
+                        icon: Icon(Icons.delete),
+                        onPressed: () async {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('Are you sure?',
+                                  style: TextStyle(fontWeight: FontWeight.w400, fontSize: 18, color: Colors.black),
+                                ),
+                                actions: [
+                                  SimpleDialogOption(
+                                    child: Text("Yes",
+                                        style: TextStyle(fontWeight: FontWeight.w400, fontSize: 16)
+                                    ),
+                                    onPressed: () async {
+                                      int count = 0;
+                                      Navigator.of(context).popUntil((_) => count++ >= 2);
+                                      await FirebaseFirestore.instance.runTransaction((Transaction myTransaction) async {
+                                        myTransaction.delete(snapshot.data.docs[widget.index].reference);
+                                      });
+                                    },
+                                  ),
+                                  SimpleDialogOption(
+                                    child: Text("No",
+                                        style: TextStyle(fontWeight: FontWeight.w400, fontSize: 16)),
+                                    onPressed: (){
+                                      Navigator.pop(context);
+                                    },
+                                  )
+                                ],
+                              );
+                            }
+                          );
+                        },
+                      )
                     ],
                   ),
                   Image.network(snapshot.data.docs[widget.index]['photoPost']),
