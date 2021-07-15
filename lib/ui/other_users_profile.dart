@@ -79,9 +79,6 @@ class _OtherUsersProfileState extends State<OtherUsersProfile> {
                           padding: const EdgeInsets.only(left: 50),
                           child: Column(
                             children: [
-                              Text("Posts",
-                                  style: TextStyle(color: Colors.black, fontSize: 22)
-                              ),
                               StreamBuilder(
                                 stream: FirebaseFirestore.instance
                                     .collection("posts")
@@ -92,9 +89,12 @@ class _OtherUsersProfileState extends State<OtherUsersProfile> {
                                     return Container();
                                   final doc = snapshot.data.docs;
                                   return Text(doc.length.toString(),
-                                    style: TextStyle(fontWeight: FontWeight.w300, color: Colors.black, fontSize: 20),
+                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 22),
                                   );
                                 },
+                              ),
+                              Text("Posts",
+                                  style: TextStyle(fontWeight: FontWeight.w300, color: Colors.black, fontSize: 20)
                               ),
                             ],
                           ),
