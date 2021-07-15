@@ -1,26 +1,23 @@
+import 'package:facegram/services/auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'auth.dart';
-import 'database.dart';
-import 'login.dart';
+import 'forgot_password.dart';
+import 'register.dart';
 import 'screen.dart';
 
-class Register extends StatefulWidget {
-  const Register({Key key}) : super(key: key);
+class Login extends StatefulWidget {
+  const Login({Key key}) : super(key: key);
 
   @override
-  _RegisterState createState() => _RegisterState();
+  _LoginState createState() => _LoginState();
 }
 
-class _RegisterState extends State<Register> {
+class _LoginState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
-  TextEditingController username = new TextEditingController();
   TextEditingController email = new TextEditingController();
   TextEditingController password = new TextEditingController();
   AuthService authService = new AuthService();
-  DatabaseMethods databaseMethods = new DatabaseMethods();
-  String error, userName;
+  String error;
   bool loading = false;
 
   Widget showAlert() {
@@ -63,7 +60,7 @@ class _RegisterState extends State<Register> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: loading ? Container(
+      body: loading? Container(
         child: Center(
           child: CircularProgressIndicator(),
         ),
@@ -72,7 +69,9 @@ class _RegisterState extends State<Register> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              Icon(Icons.person_outline, color: Colors.blue, size: 60,),
+              Text('Facegram',
+                style: TextStyle(fontSize: 45, fontFamily: 'Satisfy', fontWeight: FontWeight.bold),
+              ),
               Form(
                 key: _formKey,
                 child: Column(
@@ -80,44 +79,23 @@ class _RegisterState extends State<Register> {
                     Padding(
                       padding: EdgeInsets.fromLTRB(30,30,30,0),
                       child: TextFormField(
-                        controller: username,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(RegExp("[a-z0-9]")),
-                        ],
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(borderSide: BorderSide()),
-                          labelText: 'Username',
-                          labelStyle: TextStyle(fontWeight: FontWeight.w500)
-                        ),
-                        validator: (val){
-                          if(val.isEmpty)
-                            return 'Username can\'t be empty';
-                          else if(val.length < 3)
-                            return 'Username must be at least 3 characters';
-                          return null;
-                        },
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(30,20,30,0),
-                      child: TextFormField(
                         controller: email,
                         decoration: InputDecoration(
-                            border: OutlineInputBorder(borderSide: BorderSide()),
-                            labelText: 'Email',
-                            labelStyle: TextStyle(fontWeight: FontWeight.w500)
+                          border: OutlineInputBorder(borderSide: BorderSide()),
+                          labelText: 'Email',
+                          labelStyle: TextStyle(fontWeight: FontWeight.w500)
                         ),
-                        validator: (val) {
-                          if(val.isEmpty)
+                        validator: (value) {
+                          if(value.isEmpty)
                             return 'Email can\'t be empty';
-                          if (!RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(val))
+                          if (!RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(value))
                             return 'Enter a valid email';
                           return null;
                         },
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.fromLTRB(30,20,30,30),
+                      padding: EdgeInsets.fromLTRB(30,20,30,0),
                       child: TextFormField(
                         controller: password,
                         obscureText: true,
@@ -129,39 +107,38 @@ class _RegisterState extends State<Register> {
                         validator: (value) {
                           if(value.isEmpty)
                             return 'Password can\'t be empty';
-                          if(value.length < 8)
-                            return 'Password must be at least 8 characters';
                           return null;
                         },
                       ),
-                    ),
+                    )
                   ],
-                )
+                ),
+              ),
+              Container(
+                alignment: Alignment.centerRight,
+                padding: EdgeInsets.fromLTRB(0,15,30,40),
+                child: InkWell(
+                  onTap: (){
+                    Navigator.push(
+                        context, MaterialPageRoute(
+                        builder: (context) => ForgotPassword())
+                    );
+                  },
+                  child: Text('Forgot password?',
+                      style: TextStyle(fontWeight: FontWeight.w400)
+                  ),
+                ),
               ),
               ElevatedButton(
                 onPressed: () async {
-                  final valid = await databaseMethods.usernameCheck(username.text);
-                  if (!valid) {
-                    setState(() {
-                      error = 'The username ${username.text} is not available.';
-                    });
-                  }
-                  else if (_formKey.currentState.validate()) {
+                  if (_formKey.currentState.validate()) {
                     setState(() {
                       loading = true;
                     });
                     try {
-                      Map<String, String> userInfoMap = {
-                        "username" : username.text,
-                        "email" : email.text,
-                        "name" : "",
-                        "photo" : null,
-                        "bio" : ""
-                      };
-                      dynamic result = await authService.createUser(
-                          username.text, email.text.trim(), password.text.trim()
+                      dynamic result = await authService.signIn(
+                          email.text.trim(), password.text.trim()
                       );
-                      databaseMethods.uploadUserInfo(userInfoMap);
                       if (result != null) {
                         final SharedPreferences prefs = await SharedPreferences.getInstance();
                         prefs.setString('email', email.text);
@@ -178,7 +155,7 @@ class _RegisterState extends State<Register> {
                     }
                   }
                 },
-                child: Text('Sign up',
+                child: Text('Log in',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 style: ElevatedButton.styleFrom(
@@ -192,17 +169,17 @@ class _RegisterState extends State<Register> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Already have an account? ',
+                  Text('Don\'t have an account? ',
                     style: TextStyle(fontWeight: FontWeight.w300, fontSize: 18),
                   ),
                   InkWell(
                     onTap: (){
                       Navigator.push(
                           context, MaterialPageRoute(
-                          builder: (context) => Login())
+                          builder: (context) => Register())
                       );
                     },
-                    child: Text('Sign in',
+                    child: Text('Sign up',
                       style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18, color: Colors.blue),
                     ),
                   )

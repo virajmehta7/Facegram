@@ -1,8 +1,8 @@
+import 'package:facegram/services/auth.dart';
+import 'package:facegram/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'auth.dart';
-import 'database.dart';
 import 'other_users_profile.dart';
 
 class Search extends StatefulWidget {

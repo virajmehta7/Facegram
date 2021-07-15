@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:facegram/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'database.dart';
 import 'dart:io';
 
 class UploadPost extends StatefulWidget {

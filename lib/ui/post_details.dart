@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:facegram/services/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'auth.dart';
 
 class PostDetails extends StatefulWidget {
   final int index;

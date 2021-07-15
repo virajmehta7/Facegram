@@ -1,6 +1,6 @@
+import 'package:facegram/services/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'auth.dart';
 
 class ForgotPassword extends StatefulWidget {
   const ForgotPassword({Key key}) : super(key: key);
